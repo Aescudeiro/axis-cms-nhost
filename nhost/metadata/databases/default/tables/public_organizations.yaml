@@ -1,0 +1,28 @@
+table:
+  name: organizations
+  schema: public
+select_permissions:
+  - role: org_admin
+    permission:
+      columns:
+        - name
+        - slug
+        - created_at
+        - updated_at
+        - id
+      filter:
+        id:
+          _eq: X-Hasura-Organization-Id
+    comment: ""
+  - role: org_editor
+    permission:
+      columns:
+        - name
+        - slug
+        - created_at
+        - updated_at
+        - id
+      filter:
+        id:
+          _eq: X-Hasura-Organization-Id
+    comment: ""

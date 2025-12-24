@@ -1,0 +1,74 @@
+table:
+  name: sites
+  schema: public
+insert_permissions:
+  - role: org_admin
+    permission:
+      check:
+        organization_id:
+          _eq: X-Hasura-Organization-Id
+      columns:
+        - name
+        - created_at
+        - updated_at
+        - id
+        - organization_id
+    comment: ""
+select_permissions:
+  - role: org_admin
+    permission:
+      columns:
+        - name
+        - created_at
+        - updated_at
+        - id
+        - organization_id
+      filter:
+        organization_id:
+          _eq: X-Hasura-Organization-Id
+    comment: ""
+  - role: org_editor
+    permission:
+      columns:
+        - name
+        - created_at
+        - updated_at
+        - id
+        - organization_id
+      filter:
+        organization_id:
+          _eq: X-Hasura-Organization-Id
+    comment: ""
+  - role: public
+    permission:
+      columns:
+        - name
+        - created_at
+        - updated_at
+        - id
+        - organization_id
+      filter:
+        organization_id:
+          _eq: X-Hasura-Organization-Id
+    comment: ""
+update_permissions:
+  - role: org_admin
+    permission:
+      columns:
+        - name
+        - created_at
+        - updated_at
+        - id
+        - organization_id
+      filter:
+        organization_id:
+          _eq: X-Hasura-Organization-Id
+      check: null
+    comment: ""
+delete_permissions:
+  - role: org_admin
+    permission:
+      filter:
+        organization_id:
+          _eq: X-Hasura-Organization-Id
+    comment: ""
