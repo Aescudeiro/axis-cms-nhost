@@ -1,55 +1,28 @@
 table:
   name: page_contents
   schema: public
+object_relationships:
+  - name: content
+    using:
+      foreign_key_constraint_on: content_id
+  - name: page
+    using:
+      foreign_key_constraint_on: page_id
 insert_permissions:
-  - role: org_admin
+  - role: user
     permission:
       check:
-        _exists:
-          _table:
-            name: pages
-            schema: public
-          _where:
-            _and:
-              - id:
-                  _eq: page_id
-              - _exists:
-                  _table:
-                    name: sites
-                    schema: public
-                  _where:
-                    _and:
-                      - id:
-                          _eq: site_id
-                      - organization_id:
-                          _eq: X-Hasura-Organization-Id
-      columns:
-        - order
-        - content_id
-        - id
-        - page_id
-    comment: ""
-  - role: org_editor
-    permission:
-      check:
-        _exists:
-          _table:
-            name: pages
-            schema: public
-          _where:
-            _and:
-              - id:
-                  _eq: page_id
-              - _exists:
-                  _table:
-                    name: sites
-                    schema: public
-                  _where:
-                    _and:
-                      - id:
-                          _eq: site_id
-                      - organization_id:
-                          _eq: X-Hasura-Organization-Id
+        page:
+          site:
+            organization:
+              organization_users:
+                _and:
+                  - user_id:
+                      _eq: X-Hasura-User-Id
+                  - role:
+                      _in:
+                        - org_admin
+                        - org_editor
       columns:
         - order
         - content_id
@@ -57,7 +30,7 @@ insert_permissions:
         - page_id
     comment: ""
 select_permissions:
-  - role: org_admin
+  - role: user
     permission:
       columns:
         - order
@@ -65,73 +38,20 @@ select_permissions:
         - id
         - page_id
       filter:
-        _exists:
-          _table:
-            name: pages
-            schema: public
-          _where:
-            _and:
-              - id:
-                  _eq: page_id
-              - _exists:
-                  _table:
-                    name: sites
-                    schema: public
-                  _where:
-                    _and:
-                      - id:
-                          _eq: site_id
-                      - organization_id:
-                          _eq: X-Hasura-Organization-Id
-    comment: ""
-  - role: org_editor
-    permission:
-      columns:
-        - order
-        - content_id
-        - id
-        - page_id
-      filter:
-        _exists:
-          _table:
-            name: pages
-            schema: public
-          _where:
-            _and:
-              - id:
-                  _eq: page_id
-              - _exists:
-                  _table:
-                    name: sites
-                    schema: public
-                  _where:
-                    _and:
-                      - id:
-                          _eq: site_id
-                      - organization_id:
-                          _eq: X-Hasura-Organization-Id
-    comment: ""
-  - role: public
-    permission:
-      columns:
-        - order
-        - content_id
-        - id
-        - page_id
-      filter:
-        _exists:
-          _table:
-            name: pages
-            schema: public
-          _where:
-            _and:
-              - id:
-                  _eq: page_id
-              - status:
-                  _eq: published
+        page:
+          site:
+            organization:
+              organization_users:
+                _and:
+                  - user_id:
+                      _eq: X-Hasura-User-Id
+                  - role:
+                      _in:
+                        - org_admin
+                        - org_editor
     comment: ""
 update_permissions:
-  - role: org_admin
+  - role: user
     permission:
       columns:
         - order
@@ -139,86 +59,43 @@ update_permissions:
         - id
         - page_id
       filter:
-        _exists:
-          _table:
-            name: pages
-            schema: public
-          _where:
-            _and:
-              - id:
-                  _eq: page_id
-              - _exists:
-                  _table:
-                    name: sites
-                    schema: public
-                  _where:
-                    _and:
-                      - id:
-                          _eq: site_id
-                      - organization_id:
-                          _eq: X-Hasura-Organization-Id
-      check: null
-    comment: ""
-  - role: org_editor
-    permission:
-      columns:
-        - order
-        - content_id
-        - id
-        - page_id
-      filter:
-        _exists:
-          _table:
-            name: pages
-            schema: public
-          _where:
-            _and:
-              - id:
-                  _eq: page_id
-              - _exists:
-                  _table:
-                    name: sites
-                    schema: public
-                  _where:
-                    _and:
-                      - id:
-                          _eq: site_id
-                      - organization_id:
-                          _eq: X-Hasura-Organization-Id
+        page:
+          site:
+            organization:
+              organization_users:
+                _and:
+                  - user_id:
+                      _eq: X-Hasura-User-Id
+                  - role:
+                      _in:
+                        - org_admin
+                        - org_editor
       check:
-        _exists:
-          _table:
-            name: pages
-            schema: public
-          _where:
-            _exists:
-              _table:
-                name: sites
-                schema: public
-              _where:
-                organization_id:
-                  _eq: X-Hasura-Organization-Id
+        page:
+          site:
+            organization:
+              organization_users:
+                _and:
+                  - user_id:
+                      _eq: X-Hasura-User-Id
+                  - role:
+                      _in:
+                        - org_admin
+                        - org_editor
     comment: ""
 delete_permissions:
-  - role: org_admin
+  - role: user
     permission:
       filter:
-        _exists:
-          _table:
-            name: pages
-            schema: public
-          _where:
-            _and:
-              - id:
-                  _eq: page_id
-              - _exists:
-                  _table:
-                    name: sites
-                    schema: public
-                  _where:
-                    _and:
-                      - id:
-                          _eq: site_id
-                      - organization_id:
-                          _eq: X-Hasura-Organization-Id
+        page:
+          site:
+            organization:
+              organization_users:
+                _and:
+                  - user_id:
+                      _eq: X-Hasura-User-Id
+                  - role:
+                      _in:
+                        - org_admin
+                        - org_editor
     comment: ""

@@ -1,22 +1,15 @@
 table:
   name: organization_users
   schema: public
-insert_permissions:
-  - role: org_admin
-    permission:
-      check:
-        organization_id:
-          _eq: X-Hasura-Organization-Id
-      columns:
-        - role
-        - created_at
-        - updated_at
-        - id
-        - organization_id
-        - user_id
-    comment: ""
+object_relationships:
+  - name: organization
+    using:
+      foreign_key_constraint_on: organization_id
+  - name: user
+    using:
+      foreign_key_constraint_on: user_id
 select_permissions:
-  - role: org_admin
+  - role: user
     permission:
       columns:
         - role
@@ -26,24 +19,21 @@ select_permissions:
         - organization_id
         - user_id
       filter:
-        organization_id:
-          _eq: X-Hasura-Organization-Id
-    comment: ""
-  - role: org_editor
-    permission:
-      columns:
-        - role
-        - created_at
-        - updated_at
-        - id
-        - organization_id
-        - user_id
-      filter:
-        organization_id:
-          _eq: X-Hasura-Organization-Id
+        _exists:
+          _table:
+            name: organization_users
+            schema: public
+          _where:
+            _and:
+              - user_id:
+                  _eq: X-Hasura-User-Id
+              - organization_id:
+                  _ceq:
+                    - $
+                    - organization_id
     comment: ""
 update_permissions:
-  - role: org_admin
+  - role: user
     permission:
       columns:
         - role
@@ -52,15 +42,20 @@ update_permissions:
         - id
         - organization_id
         - user_id
-      filter: {}
-      check:
-        organization_id:
-          _eq: X-Hasura-Organization-Id
-    comment: ""
-delete_permissions:
-  - role: org_admin
-    permission:
       filter:
-        organization_id:
-          _eq: X-Hasura-Organization-Id
+        _exists:
+          _table:
+            name: organization_users
+            schema: public
+          _where:
+            _and:
+              - user_id:
+                  _eq: X-Hasura-User-Id
+              - organization_id:
+                  _ceq:
+                    - $
+                    - organization_id
+              - role:
+                  _eq: org_admin
+      check: null
     comment: ""

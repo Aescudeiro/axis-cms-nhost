@@ -1,8 +1,20 @@
 table:
   name: pages
   schema: public
+object_relationships:
+  - name: site
+    using:
+      foreign_key_constraint_on: site_id
+array_relationships:
+  - name: page_contents
+    using:
+      foreign_key_constraint_on:
+        column: page_id
+        table:
+          name: page_contents
+          schema: public
 insert_permissions:
-  - role: org_admin
+  - role: user
     permission:
       check:
         _exists:
@@ -10,27 +22,25 @@ insert_permissions:
             name: sites
             schema: public
           _where:
-            organization_id:
-              _eq: X-Hasura-Organization-Id
-      columns:
-        - slug
-        - status
-        - title
-        - created_at
-        - updated_at
-        - id
-        - site_id
-    comment: ""
-  - role: org_editor
-    permission:
-      check:
-        _exists:
-          _table:
-            name: sites
-            schema: public
-          _where:
-            organization_id:
-              _eq: X-Hasura-Organization-Id
+            _and:
+              - id:
+                  _ceq:
+                    - $
+                    - site_id
+              - _exists:
+                  _table:
+                    name: organization_users
+                    schema: public
+                  _where:
+                    _and:
+                      - user_id:
+                          _eq: X-Hasura-User-Id
+                      - organization_id:
+                          _ceq: organization_id
+                      - role:
+                          _in:
+                            - org_admin
+                            - org_editor
       columns:
         - slug
         - status
@@ -41,44 +51,6 @@ insert_permissions:
         - site_id
     comment: ""
 select_permissions:
-  - role: org_admin
-    permission:
-      columns:
-        - slug
-        - status
-        - title
-        - created_at
-        - updated_at
-        - id
-        - site_id
-      filter:
-        _exists:
-          _table:
-            name: sites
-            schema: public
-          _where:
-            organization_id:
-              _eq: X-Hasura-Organization-Id
-    comment: ""
-  - role: org_editor
-    permission:
-      columns:
-        - slug
-        - status
-        - title
-        - created_at
-        - updated_at
-        - id
-        - site_id
-      filter:
-        _exists:
-          _table:
-            name: sites
-            schema: public
-          _where:
-            organization_id:
-              _eq: X-Hasura-Organization-Id
-    comment: ""
   - role: public
     permission:
       columns:
@@ -93,8 +65,7 @@ select_permissions:
         status:
           _eq: published
     comment: ""
-update_permissions:
-  - role: org_admin
+  - role: user
     permission:
       columns:
         - slug
@@ -104,38 +75,96 @@ update_permissions:
         - updated_at
         - id
         - site_id
-      filter: {}
+      filter:
+        _exists:
+          _table:
+            name: sites
+            schema: public
+          _where:
+            _and:
+              - id:
+                  _ceq:
+                    - $
+                    - site_id
+              - _exists:
+                  _table:
+                    name: organization_users
+                    schema: public
+                  _where:
+                    _and:
+                      - user_id:
+                          _eq: X-Hasura-User-Id
+                      - organization_id:
+                          _ceq: organization_id
+                      - role:
+                          _in:
+                            - org_admin
+                            - org_editor
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - slug
+        - status
+        - title
+        - created_at
+        - updated_at
+        - id
+        - site_id
+      filter:
+        _exists:
+          _table:
+            name: sites
+            schema: public
+          _where:
+            _and:
+              - id:
+                  _ceq:
+                    - $
+                    - site_id
+              - _exists:
+                  _table:
+                    name: organization_users
+                    schema: public
+                  _where:
+                    _and:
+                      - user_id:
+                          _eq: X-Hasura-User-Id
+                      - organization_id:
+                          _ceq: organization_id
+                      - role:
+                          _in:
+                            - org_admin
+                            - org_editor
       check:
         _exists:
           _table:
             name: sites
             schema: public
           _where:
-            organization_id:
-              _eq: X-Hasura-Organization-Id
-    comment: ""
-  - role: org_editor
-    permission:
-      columns:
-        - slug
-        - status
-        - title
-        - created_at
-        - updated_at
-        - id
-        - site_id
-      filter:
-        _exists:
-          _table:
-            name: sites
-            schema: public
-          _where:
-            organization_id:
-              _eq: X-Hasura-Organization-Id
-      check: null
+            _and:
+              - id:
+                  _ceq:
+                    - $
+                    - site_id
+              - _exists:
+                  _table:
+                    name: organization_users
+                    schema: public
+                  _where:
+                    _and:
+                      - user_id:
+                          _eq: X-Hasura-User-Id
+                      - organization_id:
+                          _ceq: organization_id
+                      - role:
+                          _in:
+                            - org_admin
+                            - org_editor
     comment: ""
 delete_permissions:
-  - role: org_admin
+  - role: user
     permission:
       filter:
         _exists:
@@ -143,6 +172,23 @@ delete_permissions:
             name: sites
             schema: public
           _where:
-            organization_id:
-              _eq: X-Hasura-Organization-Id
+            _and:
+              - id:
+                  _ceq:
+                    - $
+                    - site_id
+              - _exists:
+                  _table:
+                    name: organization_users
+                    schema: public
+                  _where:
+                    _and:
+                      - user_id:
+                          _eq: X-Hasura-User-Id
+                      - organization_id:
+                          _ceq: organization_id
+                      - role:
+                          _in:
+                            - org_admin
+                            - org_editor
     comment: ""

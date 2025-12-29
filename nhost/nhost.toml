@@ -54,7 +54,7 @@ allowed = ['en']
 
 [auth.user.gravatar]
 enabled = true
-default = 'blank'
+default = 'monsterid'
 rating = 'g'
 
 [auth.user.email]
@@ -63,7 +63,11 @@ rating = 'g'
 
 [auth.session]
 [auth.session.accessToken]
-expiresIn = 900
+expiresIn = 3600
+
+[[auth.session.accessToken.customClaims]]
+key = 'Organizations-Ids'
+value = 'organization_users[].organization_id'
 
 [auth.session.refreshToken]
 expiresIn = 2592000

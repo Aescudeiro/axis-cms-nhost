@@ -1,8 +1,30 @@
 table:
   name: organizations
   schema: public
+array_relationships:
+  - name: contents
+    using:
+      foreign_key_constraint_on:
+        column: organization_id
+        table:
+          name: contents
+          schema: public
+  - name: organization_users
+    using:
+      foreign_key_constraint_on:
+        column: organization_id
+        table:
+          name: organization_users
+          schema: public
+  - name: sites
+    using:
+      foreign_key_constraint_on:
+        column: organization_id
+        table:
+          name: sites
+          schema: public
 select_permissions:
-  - role: org_admin
+  - role: user
     permission:
       columns:
         - name
@@ -11,10 +33,21 @@ select_permissions:
         - updated_at
         - id
       filter:
-        id:
-          _eq: X-Hasura-Organization-Id
+        _exists:
+          _table:
+            name: organization_users
+            schema: public
+          _where:
+            _and:
+              - user_id:
+                  _eq: X-Hasura-User-Id
+              - organization_id:
+                  _ceq:
+                    - $
+                    - id
     comment: ""
-  - role: org_editor
+update_permissions:
+  - role: user
     permission:
       columns:
         - name
@@ -23,6 +56,19 @@ select_permissions:
         - updated_at
         - id
       filter:
-        id:
-          _eq: X-Hasura-Organization-Id
+        _exists:
+          _table:
+            name: organization_users
+            schema: public
+          _where:
+            _and:
+              - user_id:
+                  _eq: X-Hasura-User-Id
+              - organization_id:
+                  _ceq:
+                    - $
+                    - id
+              - role:
+                  _eq: org_admin
+      check: null
     comment: ""
