@@ -32,7 +32,6 @@ insert_permissions:
               - role:
                   _in:
                     - org_admin
-                    - org_editor
       columns:
         - name
         - created_at
